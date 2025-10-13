@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parser LR(1) - Puntos Extras</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+    <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Parser LR(1)</h1>
+        <p>Generador de tablas de parsing LR(1) y analizador sintáctico</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="input-section">
+                <h2>Entrada de Gramática</h2>
+                <div class="grammar-input">
+                    <label for="grammar">Ingrese la gramática (una producción por línea):</label>
+                    <textarea id="grammar" rows="10" placeholder="Ejemplo:
+S -> E
+E -> E + T
+E -> T
+T -> T * F
+T -> F
+F -> ( E )
+F -> id"></textarea>
+                    <div class="input-controls">
+                        <button id="parse-grammar" class="btn primary">Generar Tabla LR(1)</button>
+                        <button id="clear-grammar" class="btn secondary">Limpiar</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="parsing-section">
+                <h2>Análisis de Cadena</h2>
+                <div class="string-input">
+                    <label for="input-string">Cadena a analizar:</label>
+                    <input type="text" id="input-string" placeholder="id + id * id">
+                    <button id="parse-string" class="btn primary">Analizar</button>
+                </div>
+                <div id="parsing-result" class="result-section"></div>
+            </section>
+
+            <div class="tables-container">
+                <section class="first-follow-section">
+                    <h2>Conjuntos FIRST y FOLLOW</h2>
+                    <div id="first-follow-display" class="table-display"></div>
+                </section>
+
+                <section class="items-section">
+                    <h2>Conjuntos de Items LR(1)</h2>
+                    <div id="items-display" class="table-display"></div>
+                </section>
+
+                <section class="parsing-table-section">
+                    <h2>Tabla de Parsing LR(1)</h2>
+                    <div id="parsing-table-display" class="table-display"></div>
+                </section>
+
+                <section class="automaton-section">
+                    <h2>Autómata LR(1)</h2>
+                    <div class="graph-controls">
+                        <button id="toggle-layout" class="btn secondary">Cambiar Layout</button>
+                        <button id="fit-graph" class="btn secondary">Ajustar Vista</button>
+                        <button id="export-graph" class="btn secondary">Exportar Gráfico</button>
+                    </div>
+                    <div id="automaton-graph" class="graph-display"></div>
+                </section>
+            </div>
+
+            <section class="trace-section">
+                <h2>Traza del Parsing</h2>
+                <div id="parsing-trace" class="trace-display"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Compiladores - UTEC - Puntos Extras Examen 2</p>
+    </footer>
+
+    <script src="lr1-parser.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+
+{% block title %}Parser LR(1) - Analizador Sintáctico{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-cogs me-3"></i>
+                    Parser LR(1)
+                </h1>
+                <p class="lead mb-4">
+                    Analizador sintáctico LR(1) completo con visualización de autómata y tabla de parsing.
+                    Genera gráficos interactivos y analiza cadenas paso a paso.
+                </p>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-light btn-lg" onclick="loadExample('arithmetic')">
+                        <i class="fas fa-play me-2"></i>
+                        Probar Ejemplo
+                    </button>
+                    <button class="btn btn-outline-light btn-lg" onclick="scrollToSection('#grammar-section')">
+                        <i class="fas fa-arrow-down me-2"></i>
+                        Comenzar
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="fas fa-project-diagram display-1 opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Grammar Input Section -->
+<section id="grammar-section" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Entrada de Gramática
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="mb-3">
+                                    <label for="grammar-input" class="form-label fw-bold">
+                                        Ingrese la gramática libre de contexto:
+                                    </label>
+                                    <textarea id="grammar-input" 
+                                              class="form-control font-monospace" 
+                                              rows="10"
+                                              placeholder="Ejemplo:
+S -> E
+E -> E + T
+E -> T
+T -> T * F
+T -> F
+F -> ( E )
+F -> id"></textarea>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Una producción por línea. Formato: A -> α (use 'ε' para epsilon)
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="input-string" class="form-label fw-bold">
+                                        Cadena a analizar:
+                                    </label>
+                                    <input type="text" 
+                                           id="input-string" 
+                                           class="form-control font-monospace"
+                                           placeholder="id + id * id">
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Separe los tokens con espacios
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button id="btn-parse-grammar" class="btn btn-success btn-lg">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        Generar Parser LR(1)
+                                    </button>
+                                    <button id="btn-parse-string" class="btn btn-primary" disabled>
+                                        <i class="fas fa-play me-2"></i>
+                                        Analizar Cadena
+                                    </button>
+                                    <button id="btn-clear" class="btn btn-outline-secondary">
+                                        <i class="fas fa-trash me-2"></i>
+                                        Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-list me-2"></i>
+                                            Ejemplos
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="loadExample('arithmetic')">
+                                                📟 Expresiones Aritméticas
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" onclick="loadExample('simple')">
+                                                🔤 Gramática Simple
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm" onclick="loadExample('balanced')">
+                                                () Paréntesis Balanceados
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-lightbulb me-2"></i>Características:</h6>
+                                        <ul class="mb-0 small">
+                                            <li>Algoritmo LR(1) completo</li>
+                                            <li>Conjuntos FIRST y FOLLOW</li>
+                                            <li>Autómata visualizado</li>
+                                            <li>Tabla ACTION/GOTO</li>
+                                            <li>Traza de parsing</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Status Section -->
+<section id="status-section" class="py-3 bg-light">
+    <div class="container">
+        <div id="status-alert" style="display: none;"></div>
+        <div id="loading-indicator" style="display: none;">
+            <div class="text-center">
+                <div class="spinner-border text-primary me-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <span class="h5">Procesando gramática...</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Results Section -->
+<section id="results-section" class="py-5" style="display: none;">
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-layer-group fa-2x mb-2"></i>
+                        <h4 id="states-count">0</h4>
+                        <small>Estados</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-font fa-2x mb-2"></i>
+                        <h4 id="terminals-count">0</h4>
+                        <small>Terminales</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-code fa-2x mb-2"></i>
+                        <h4 id="nonterminals-count">0</h4>
+                        <small>No Terminales</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-table fa-2x mb-2"></i>
+                        <h4 id="table-size">0</h4>
+                        <small>Entradas Tabla</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs for Results -->
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="results-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="first-follow-tab" data-bs-toggle="tab" 
+                                data-bs-target="#first-follow-pane" type="button" role="tab">
+                            <i class="fas fa-list-ol me-2"></i>FIRST/FOLLOW
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="states-tab" data-bs-toggle="tab" 
+                                data-bs-target="#states-pane" type="button" role="tab">
+                            <i class="fas fa-layer-group me-2"></i>Estados
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="table-tab" data-bs-toggle="tab" 
+                                data-bs-target="#table-pane" type="button" role="tab">
+                            <i class="fas fa-table me-2"></i>Tabla Parsing
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="parsing-tab" data-bs-toggle="tab" 
+                                data-bs-target="#parsing-pane" type="button" role="tab">
+                            <i class="fas fa-play me-2"></i>Análisis
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="results-tab-content">
+                    <!-- FIRST/FOLLOW Tab -->
+                    <div class="tab-pane fade show active" id="first-follow-pane" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-arrow-right me-2"></i>Conjuntos FIRST</h5>
+                                <div id="first-sets-display" class="border rounded p-3 bg-light font-monospace"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-arrow-left me-2"></i>Conjuntos FOLLOW</h5>
+                                <div id="follow-sets-display" class="border rounded p-3 bg-light font-monospace"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- States Tab -->
+                    <div class="tab-pane fade" id="states-pane" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-layer-group me-2"></i>Estados del Autómata LR(1)</h5>
+                            <button class="btn btn-outline-primary btn-sm" onclick="exportAutomaton()">
+                                <i class="fas fa-download me-1"></i>Exportar Gráfico
+                            </button>
+                        </div>
+                        <div id="states-display" class="row"></div>
+                    </div>
+                    
+                    <!-- Table Tab -->
+                    <div class="tab-pane fade" id="table-pane" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-table me-2"></i>Tabla de Parsing LR(1)</h5>
+                            <button class="btn btn-outline-primary btn-sm" onclick="exportTable()">
+                                <i class="fas fa-download me-1"></i>Exportar Tabla
+                            </button>
+                        </div>
+                        <div id="parsing-table-display" class="table-responsive"></div>
+                    </div>
+                    
+                    <!-- Parsing Tab -->
+                    <div class="tab-pane fade" id="parsing-pane" role="tabpanel">
+                        <h5><i class="fas fa-play me-2"></i>Resultado del Análisis</h5>
+                        <div id="parsing-result-display"></div>
+                        <h5 class="mt-4"><i class="fas fa-list me-2"></i>Traza del Parsing</h5>
+                        <div id="parsing-trace-display" class="border rounded p-3 bg-light font-monospace" 
+                             style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Graph Section -->
+<section id="graph-section" class="py-5 bg-light" style="display: none;">
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-project-diagram me-2"></i>
+                    Visualización del Autómata LR(1)
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div id="automaton-graph-display" class="text-center">
+                            <img id="automaton-image" class="img-fluid rounded shadow" style="max-height: 600px;">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-table me-2"></i>
+                                    Tabla de Parsing
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="table-graph-display" class="text-center">
+                                    <img id="table-image" class="img-fluid rounded shadow">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Leyenda
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="legend-circle bg-success me-2"></div>
+                                    <small>Estado Inicial</small>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="legend-circle bg-danger me-2"></div>
+                                    <small>Estado de Aceptación</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="legend-circle bg-light border me-2"></div>
+                                    <small>Estado Normal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Variables globales
+let currentGrammarData = null;
+
+// Inicialización
+$(document).ready(function() {
+    initializeEventHandlers();
+    loadDefaultExample();
+});
+
+function initializeEventHandlers() {
+    $('#btn-parse-grammar').click(parseGrammar);
+    $('#btn-parse-string').click(parseString);
+    $('#btn-clear').click(clearAll);
+    
+    // Hotkeys
+    $('#grammar-input').keydown(function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            parseGrammar();
+        }
+    });
+    
+    $('#input-string').keydown(function(e) {
+        if (e.key === 'Enter') {
+            parseString();
+        }
+    });
+}
+
+function loadDefaultExample() {
+    const defaultGrammar = `S -> E
+E -> E + T
+E -> T
+T -> T * F
+T -> F
+F -> ( E )
+F -> id`;
+    
+    $('#grammar-input').val(defaultGrammar);
+    $('#input-string').val('id + id * id');
+}
+
+async function loadExample(exampleType) {
+    try {
+        const response = await fetch('/api/examples');
+        const examples = await response.json();
+        
+        if (examples[exampleType]) {
+            const example = examples[exampleType];
+            $('#grammar-input').val(example.grammar);
+            $('#input-string').val(example.test_strings[0]);
+            
+            showStatus('success', `Ejemplo cargado: ${example.name}`);
+        }
+    } catch (error) {
+        showStatus('error', 'Error al cargar ejemplo');
+    }
+}
+
+async function parseGrammar() {
+    const grammar = $('#grammar-input').val().trim();
+    
+    if (!grammar) {
+        showStatus('error', 'Por favor ingrese una gramática');
+        return;
+    }
+    
+    showLoading(true);
+    
+    try {
+        const response = await fetch('/api/parse_grammar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ grammar: grammar })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            currentGrammarData = result.data;
+            displayResults(result.data);
+            showStatus('success', result.message);
+            $('#btn-parse-string').prop('disabled', false);
+        } else {
+            showStatus('error', result.error);
+        }
+    } catch (error) {
+        showStatus('error', 'Error de conexión al servidor');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function parseString() {
+    const inputString = $('#input-string').val().trim();
+    
+    if (!inputString) {
+        showStatus('error', 'Por favor ingrese una cadena a analizar');
+        return;
+    }
+    
+    if (!currentGrammarData) {
+        showStatus('error', 'Primero debe generar el parser LR(1)');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/parse_string', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ string: inputString })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            displayParsingResult(result.parsing_result);
+            $('#parsing-tab').click(); // Cambiar a tab de parsing
+        } else {
+            showStatus('error', result.error);
+        }
+    } catch (error) {
+        showStatus('error', 'Error al analizar cadena');
+    }
+}
+
+function displayResults(data) {
+    // Mostrar sección de resultados
+    $('#results-section').show();
+    $('#graph-section').show();
+    
+    // Actualizar contadores
+    $('#states-count').text(data.num_states);
+    $('#terminals-count').text(data.num_terminals);
+    $('#nonterminals-count').text(data.num_nonterminals);
+    
+    const tableSize = data.num_states * (data.num_terminals + data.num_nonterminals);
+    $('#table-size').text(tableSize);
+    
+    // Mostrar FIRST/FOLLOW
+    displayFirstFollow(data.first_follow);
+    
+    // Mostrar estados
+    displayStates(data.states);
+    
+    // Mostrar tabla de parsing
+    displayParsingTable(data.parsing_table);
+    
+    // Mostrar gráficos
+    displayGraphs(data);
+    
+    // Scroll a resultados
+    scrollToSection('#results-section');
+}
+
+function displayFirstFollow(firstFollow) {
+    let firstHtml = '';
+    for (const [symbol, set] of Object.entries(firstFollow.first)) {
+        firstHtml += `<div class="mb-2">
+            <strong>FIRST(${symbol}):</strong> {${set.join(', ')}}
+        </div>`;
+    }
+    $('#first-sets-display').html(firstHtml);
+    
+    let followHtml = '';
+    for (const [symbol, set] of Object.entries(firstFollow.follow)) {
+        followHtml += `<div class="mb-2">
+            <strong>FOLLOW(${symbol}):</strong> {${set.join(', ')}}
+        </div>`;
+    }
+    $('#follow-sets-display').html(followHtml);
+}
+
+function displayStates(states) {
+    let html = '';
+    
+    for (const state of states) {
+        html += `<div class="col-lg-6 col-xl-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="card-title mb-0">Estado I${state.number}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="font-monospace small">`;
+        
+        for (const item of state.items) {
+            html += `<div class="mb-1">${escapeHtml(item)}</div>`;
+        }
+        
+        html += `</div>
+                </div>
+            </div>
+        </div>`;
+    }
+    
+    $('#states-display').html(html);
+}
+
+function displayParsingTable(tableData) {
+    const states = tableData.states;
+    const terminals = tableData.terminals;
+    const nonTerminals = tableData.non_terminals;
+    const actionMatrix = tableData.action;
+    const gotoMatrix = tableData.goto;
+    
+    let html = `<table class="table table-sm table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Estado</th>`;
+    
+    // Headers ACTION
+    html += `<th colspan="${terminals.length}" class="text-center bg-success">ACTION</th>`;
+    
+    // Headers GOTO
+    html += `<th colspan="${nonTerminals.length}" class="text-center bg-warning">GOTO</th>`;
+    
+    html += `</tr><tr><th></th>`;
+    
+    // Sub-headers terminales
+    for (const terminal of terminals) {
+        html += `<th class="text-center bg-light">${escapeHtml(terminal)}</th>`;
+    }
+    
+    // Sub-headers no terminales
+    for (const nt of nonTerminals) {
+        html += `<th class="text-center bg-light">${escapeHtml(nt)}</th>`;
+    }
+    
+    html += `</tr></thead><tbody>`;
+    
+    // Filas de datos
+    for (const state of states) {
+        html += `<tr><th class="bg-light">${state}</th>`;
+        
+        // Acciones
+        for (const terminal of terminals) {
+            const action = actionMatrix[state][terminal] || '';
+            const cellClass = action === '' ? 'text-muted' : (action.startsWith('s') ? 'table-success' : 
+                             action.startsWith('r') ? 'table-warning' : 
+                             action === 'acc' ? 'table-info' : '');
+            html += `<td class="text-center font-monospace ${cellClass}">${escapeHtml(action)}</td>`;
+        }
+        
+        // Gotos
+        for (const nt of nonTerminals) {
+            const gotoVal = gotoMatrix[state][nt] || '';
+            html += `<td class="text-center font-monospace">${escapeHtml(gotoVal.toString())}</td>`;
+        }
+        
+        html += `</tr>`;
+    }
+    
+    html += `</tbody></table>`;
+    
+    $('#parsing-table-display').html(html);
+}
+
+function displayParsingResult(result) {
+    let resultHtml = '';
+    
+    if (result.success) {
+        resultHtml = `<div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>✅ CADENA ACEPTADA</strong><br>
+            ${escapeHtml(result.message)}
+        </div>`;
+    } else {
+        resultHtml = `<div class="alert alert-danger">
+            <i class="fas fa-times-circle me-2"></i>
+            <strong>❌ CADENA RECHAZADA</strong><br>
+            ${escapeHtml(result.error)}
+        </div>`;
+    }
+    
+    $('#parsing-result-display').html(resultHtml);
+    
+    // Mostrar traza
+    let traceHtml = '';
+    for (const step of result.trace) {
+        traceHtml += escapeHtml(step) + '\n';
+    }
+    $('#parsing-trace-display').text(traceHtml);
+}
+
+function displayGraphs(data) {
+    // Mostrar imagen del autómata
+    $('#automaton-image').attr('src', 'data:image/png;base64,' + data.automaton_image);
+    
+    // Mostrar imagen de la tabla
+    $('#table-image').attr('src', 'data:image/png;base64,' + data.table_image);
+}
+
+function clearAll() {
+    $('#grammar-input').val('');
+    $('#input-string').val('');
+    $('#results-section').hide();
+    $('#graph-section').hide();
+    $('#status-alert').hide();
+    $('#btn-parse-string').prop('disabled', true);
+    currentGrammarData = null;
+    
+    showStatus('info', 'Datos limpiados');
+}
+
+function showStatus(type, message) {
+    const alertClass = `alert-${type === 'error' ? 'danger' : type}`;
+    const icon = type === 'success' ? 'check-circle' : 
+                 type === 'error' ? 'exclamation-triangle' : 'info-circle';
+    
+    $('#status-alert').html(`
+        <div class="alert ${alertClass} alert-dismissible fade show">
+            <i class="fas fa-${icon} me-2"></i>
+            ${escapeHtml(message)}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `).show();
+}
+
+function showLoading(show) {
+    if (show) {
+        $('#loading-indicator').show();
+        $('#btn-parse-grammar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Procesando...');
+    } else {
+        $('#loading-indicator').hide();
+        $('#btn-parse-grammar').prop('disabled', false).html('<i class="fas fa-cogs me-2"></i>Generar Parser LR(1)');
+    }
+}
+
+function scrollToSection(selector) {
+    $('html, body').animate({
+        scrollTop: $(selector).offset().top - 80
+    }, 500);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function exportAutomaton() {
+    try {
+        const response = await fetch('/api/export_graph');
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'automaton_lr1.png';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showStatus('success', 'Gráfico exportado exitosamente');
+        } else {
+            showStatus('error', 'Error al exportar gráfico');
+        }
+    } catch (error) {
+        showStatus('error', 'Error de conexión');
+    }
+}
+
+async function exportTable() {
+    try {
+        const response = await fetch('/api/export_table');
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'parsing_table_lr1.png';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showStatus('success', 'Tabla exportada exitosamente');
+        } else {
+            showStatus('error', 'Error al exportar tabla');
+        }
+    } catch (error) {
+        showStatus('error', 'Error de conexión');
+    }
+}
+</script>
+{% endblock %}
