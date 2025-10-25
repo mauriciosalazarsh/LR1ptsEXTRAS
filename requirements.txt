@@ -1,5 +1,11 @@
 Flask==3.0.0
+Flask-CORS==4.0.0
 matplotlib==3.8.2
 networkx==3.2.1
 numpy==1.26.2
 Werkzeug==3.0.1
+
+# Librerías de visualización de autómatas
+automathon>=0.0.15
+graphviz>=0.16
+Pillow>=10.1.0
