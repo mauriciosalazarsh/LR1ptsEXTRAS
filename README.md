@@ -38,23 +38,14 @@ Implementación completa de un analizador LR(1) en Python con interfaz React y v
 
 ## Instalación
 
-### Opción A: Con Docker (Recomendado)
+### Requisitos
 
-**Requisitos:**
-- Docker 20.10 o superior
-- Docker Compose 2.0 o superior
-
-No necesitas instalar Python, Node.js ni Graphviz manualmente. Docker se encarga de todo.
-
-### Opción B: Sin Docker
-
-**Requisitos:**
 - Python 3.9 o superior
 - Node.js 18 o superior
 - npm 9 o superior
 - Graphviz (instalado en el sistema)
 
-#### Instalar Graphviz (Solo si no usas Docker)
+### Instalar Graphviz
 
 ```bash
 # macOS
@@ -67,13 +58,13 @@ sudo apt-get install graphviz
 # Descargar desde https://graphviz.org/download/
 ```
 
-#### Instalar Dependencias Python (Solo si no usas Docker)
+### Instalar Dependencias Python
 
 ```bash
 pip3 install -r requirements.txt
 ```
 
-#### Instalar Dependencias de React (Solo si no usas Docker)
+### Instalar Dependencias de React
 
 ```bash
 cd frontend/react-app
@@ -91,35 +82,15 @@ cd ../..
 
 ## Ejecución
 
-### Opción 1: Docker Compose (Recomendado)
+### Backend (Terminal 1)
 
 ```bash
-# Construir y levantar todos los servicios
-docker-compose up --build
-
-# O en modo detached (segundo plano)
-docker-compose up -d
-
-# Para detener los servicios
-docker-compose down
-```
-
-La aplicación estará disponible en:
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:5001
-
-### Opción 2: Manual (Sin Docker)
-
-#### Backend (Terminal 1)
-
-```bash
-cd backend
 python3 -m backend.app
 ```
 
 El backend estará disponible en: **http://localhost:5001**
 
-#### Frontend (Terminal 2)
+### Frontend (Terminal 2)
 
 ```bash
 cd frontend/react-app
@@ -258,58 +229,14 @@ La tabla ACTION/GOTO incluye:
 - **Colores distintivos**: Verde (shift), Amarillo (reduce), Azul (accept/goto)
 - **Leyenda explicativa** para facilitar la lectura
 
-## Comandos Útiles de Docker
-
-### Ver logs de los contenedores
-```bash
-# Ver logs de todos los servicios
-docker-compose logs -f
-
-# Ver logs solo del backend
-docker-compose logs -f backend
-
-# Ver logs solo del frontend
-docker-compose logs -f frontend
-```
-
-### Reconstruir contenedores
-```bash
-# Reconstruir todo desde cero
-docker-compose down
-docker-compose build --no-cache
-docker-compose up
-```
-
-### Detener y limpiar
-```bash
-# Detener servicios
-docker-compose down
-
-# Detener y eliminar volúmenes
-docker-compose down -v
-
-# Detener y eliminar imágenes
-docker-compose down --rmi all
-```
-
-### Acceder a un contenedor
-```bash
-# Acceder al backend
-docker exec -it lr1-backend /bin/bash
-
-# Acceder al frontend
-docker exec -it lr1-frontend /bin/sh
-```
-
 ## Notas Técnicas
 
 - Backend usa puerto 5001 para evitar conflictos con AirPlay en macOS
 - Frontend usa puerto 5173 (Vite development server)
-- La aplicación requiere Graphviz (incluido en el contenedor Docker)
+- La aplicación requiere Graphviz instalado en el sistema
 - Las visualizaciones se generan bajo demanda
 - CORS configurado para permitir comunicación entre frontend y backend
 - La estructura modular permite fácil mantenimiento y escalabilidad
-- Con Docker, los cambios en el código se reflejan automáticamente (hot reload)
 
 ## Desarrollo
 
