@@ -94,7 +94,17 @@ class LR1GraphvizVisualizer:
         # Nodo invisible para la flecha de inicio
         self.dot.node('start', '', shape='point', width='0')
 
-        # Agregar estados
+        # Nodo de aceptación final
+        self.dot.node('accept', '<<B>ACCEPT</B>>',
+                     shape='doublecircle',
+                     style='filled',
+                     fillcolor='lightcoral',
+                     fontsize='18',
+                     width='1.2',
+                     height='1.2')
+
+        # Agregar estados y detectar estado de aceptación
+        accept_state = None
         for idx, state in enumerate(self.parser.states):
             label = self._format_state_label(idx, state)
             color = self._get_state_color(idx, state)
@@ -106,9 +116,9 @@ class LR1GraphvizVisualizer:
                 'height': '2.0'
             }
 
-            # Doble círculo para estados de aceptación
+            # Identificar estado de aceptación (no doble borde aquí)
             if color == 'lightcoral':
-                node_attrs['peripheries'] = '2'
+                accept_state = idx
 
             self.dot.node(str(idx), label, **node_attrs)
 
@@ -122,6 +132,17 @@ class LR1GraphvizVisualizer:
                 str(to_state),
                 label=f' {symbol} ',
                 fontcolor='blue'
+            )
+
+        # Agregar transición desde el estado de aceptación hacia ACCEPT con $
+        if accept_state is not None:
+            self.dot.edge(
+                str(accept_state),
+                'accept',
+                label=' $ ',
+                fontcolor='red',
+                color='red',
+                style='bold'
             )
 
         return self.dot

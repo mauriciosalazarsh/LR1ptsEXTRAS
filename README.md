@@ -30,8 +30,7 @@ Implementación completa de un analizador LR(1) en Python con interfaz React y v
 │
 ├── parser/
 │   ├── lr1_parser.py         # Algoritmo LR(1) principal
-│   ├── visualizer_graphviz.py    # Visualizador con Graphviz
-│   └── visualizer_automathon.py  # Visualizador con automathon
+│   └── visualizer_graphviz.py    # Visualizador con Graphviz
 │
 ├── requirements.txt          # Dependencias Python
 └── README.md                 # Esta documentación
@@ -88,7 +87,6 @@ cd ../..
 - Flask-CORS 4.0.0
 - matplotlib 3.8.2
 - networkx 3.2.1
-- automathon >= 0.0.15
 - graphviz >= 0.16
 
 ## Ejecución
@@ -141,7 +139,6 @@ El frontend estará disponible en: **http://localhost:5173**
 
 ### 2. Visualizaciones del Autómata
 - **Graphviz**: Muestra items LR(1) completos con lookahead
-- **automathon**: Visualización simplificada tipo DFA
 - Descarga en múltiples formatos (PNG, SVG)
 
 ### 3. Tabla de Parsing
@@ -217,9 +214,6 @@ Construye el parser con la gramática proporcionada.
 ### POST /api/generate_graphviz
 Genera visualización con Graphviz (items LR(1) completos).
 
-### POST /api/generate_automathon
-Genera visualización simplificada con automathon.
-
 ### GET /api/get_parsing_table
 Obtiene la tabla de parsing ACTION/GOTO.
 
@@ -245,22 +239,15 @@ Contiene la interfaz de usuario en React:
 Contiene la lógica del compilador:
 - **lr1_parser.py**: Algoritmo LR(1) completo
 - **visualizer_graphviz.py**: Visualización con items completos
-- **visualizer_automathon.py**: Visualización simplificada
 
-## Librerías de Visualización
+## Librería de Visualización
 
-### Graphviz (Recomendado para LR(1))
+### Graphviz
 - Control total sobre la visualización
 - Muestra items LR(1) completos: `A → α • β, lookahead`
 - Estados coloreados (verde=inicial, rojo=aceptación, azul=normal)
 - Formatos: PNG, PDF, SVG, DOT
 - Alta resolución (300 DPI)
-
-### automathon
-- Visualización simplificada tipo DFA
-- Solo muestra números de estados
-- Bueno para vista general rápida
-- Formatos: PNG, SVG
 
 ## Tabla de Parsing
 

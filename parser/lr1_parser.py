@@ -92,40 +92,46 @@ class LR1Parser:
         """Parsea el texto de la gramática"""
         lines = text.strip().split('\n')
         prod_number = 0
-        
+
         for line in lines:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-                
+
             if '->' not in line:
                 continue
-                
+
             left, right = line.split('->', 1)
             left = left.strip()
             right = right.strip()
-            
+
             # Primer símbolo es el inicial
             if not self.start_symbol:
                 self.start_symbol = left
-            
+
             self.non_terminals.add(left)
-            
-            # Procesar lado derecho
-            if right == 'ε' or right == 'epsilon' or right == '' or not right:
-                right_symbols = []
-            else:
-                right_symbols = right.split()
-            
-            production = Production(left, right_symbols, prod_number)
-            self.grammar.append(production)
-            prod_number += 1
-            
-            # Identificar terminales
-            for symbol in right_symbols:
-                if not self._is_non_terminal(symbol):
-                    self.terminals.add(symbol)
-        
+
+            # Soportar múltiples producciones separadas por |
+            alternatives = right.split('|')
+
+            for alternative in alternatives:
+                alternative = alternative.strip()
+
+                # Procesar lado derecho
+                if alternative == 'ε' or alternative == 'epsilon' or alternative == '' or not alternative:
+                    right_symbols = []
+                else:
+                    right_symbols = alternative.split()
+
+                production = Production(left, right_symbols, prod_number)
+                self.grammar.append(production)
+                prod_number += 1
+
+                # Identificar terminales
+                for symbol in right_symbols:
+                    if not self._is_non_terminal(symbol):
+                        self.terminals.add(symbol)
+
         # Agregar $ como terminal
         self.terminals.add('$')
     

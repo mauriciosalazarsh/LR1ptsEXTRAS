@@ -14,7 +14,6 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from parser.lr1_parser import LR1Parser
 from parser.visualizer_graphviz import LR1GraphvizVisualizer
-from parser.visualizer_automathon import LR1AutomatonVisualizer
 import base64
 from io import BytesIO
 
@@ -36,7 +35,6 @@ CORS(app, resources={
 # Parser global
 parser = None
 graphviz_viz = None
-automathon_viz = None
 
 # Gramática por defecto
 DEFAULT_GRAMMAR = """S -> q * A * B * C
@@ -52,13 +50,12 @@ D -> ε"""
 
 def init_parser(grammar_text):
     """Inicializa el parser con una gramática"""
-    global parser, graphviz_viz, automathon_viz
+    global parser, graphviz_viz
 
     parser = LR1Parser()
     parser.parse_grammar(grammar_text)
 
     graphviz_viz = LR1GraphvizVisualizer(parser)
-    automathon_viz = LR1AutomatonVisualizer(parser)
 
     return parser
 
@@ -72,7 +69,6 @@ def index():
         'endpoints': {
             'build_parser': '/api/build_parser',
             'generate_graphviz': '/api/generate_graphviz',
-            'generate_automathon': '/api/generate_automathon',
             'parse_string': '/api/parse_string',
             'get_states': '/api/get_states',
             'get_parsing_table': '/api/get_parsing_table'
@@ -150,48 +146,6 @@ def generate_graphviz():
             'svg': svg_content,
             'png_url': f'/static/automata_graphviz.png'
         })
-
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 400
-
-
-@app.route('/api/generate_automathon', methods=['POST'])
-def generate_automathon():
-    """Genera visualización con automathon"""
-    try:
-        if parser is None:
-            return jsonify({
-                'success': False,
-                'error': 'Parser no inicializado. Primero construya el parser.'
-            }), 400
-
-        # Generar visualización
-        static_path = os.path.join(os.path.dirname(__file__), '../frontend/static')
-        filename = os.path.join(static_path, 'automata_automathon')
-        os.makedirs(static_path, exist_ok=True)
-
-        automathon_viz.visualize(filename, view_pdf=False)
-
-        # Leer archivo PNG generado (automathon genera .gv.png)
-        png_file = f'{filename}.gv.png'
-        if os.path.exists(png_file):
-            # Convertir a base64 para enviar como JSON
-            with open(png_file, 'rb') as f:
-                img_data = base64.b64encode(f.read()).decode('utf-8')
-
-            return jsonify({
-                'success': True,
-                'image': f'data:image/png;base64,{img_data}',
-                'png_url': f'/static/automata_automathon.gv.png'
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'No se pudo generar la imagen'
-            }), 400
 
     except Exception as e:
         return jsonify({
@@ -348,11 +302,6 @@ def download(viz_type):
             return send_file(file_path,
                            as_attachment=True,
                            download_name='automata_lr1_graphviz.svg')
-        elif viz_type == 'automathon-png':
-            file_path = os.path.join(static_path, 'automata_automathon.gv.png')
-            return send_file(file_path,
-                           as_attachment=True,
-                           download_name='automata_lr1_automathon.png')
         else:
             return "Tipo de archivo no válido", 400
 

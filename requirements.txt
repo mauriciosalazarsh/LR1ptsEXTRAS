@@ -6,6 +6,5 @@ numpy==1.26.2
 Werkzeug==3.0.1
 
 # Librerías de visualización de autómatas
-automathon>=0.0.15
 graphviz>=0.16
 Pillow>=10.1.0

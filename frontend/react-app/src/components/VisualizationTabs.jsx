@@ -6,7 +6,6 @@ const API_URL = 'http://localhost:5001/api'
 function VisualizationTabs({ details }) {
   const [activeTab, setActiveTab] = useState('graphviz')
   const [graphvizSvg, setGraphvizSvg] = useState(null)
-  const [automathonImg, setAutomathonImg] = useState(null)
   const [parsingTable, setParsingTable] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -28,22 +27,6 @@ function VisualizationTabs({ details }) {
     }
   }
 
-  const generateAutomathon = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await axios.post(`${API_URL}/generate_automathon`)
-      if (response.data.success) {
-        setAutomathonImg(response.data.image)
-      } else {
-        setError(response.data.error)
-      }
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const loadParsingTable = async () => {
     setLoading(true)
@@ -141,12 +124,6 @@ function VisualizationTabs({ details }) {
           Graphviz (Items LR(1))
         </button>
         <button
-          className={`tab ${activeTab === 'automathon' ? 'active' : ''}`}
-          onClick={() => setActiveTab('automathon')}
-        >
-          automathon (Simplificado)
-        </button>
-        <button
           className={`tab ${activeTab === 'table' ? 'active' : ''}`}
           onClick={() => setActiveTab('table')}
         >
@@ -171,22 +148,6 @@ function VisualizationTabs({ details }) {
               <div dangerouslySetInnerHTML={{ __html: graphvizSvg }} />
             ) : (
               <p className="loading">Haz clic en "Generar con Graphviz" para visualizar el autómata</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'automathon' && (
-        <div className="tab-content active">
-          <button className="btn btn-success" onClick={generateAutomathon} disabled={loading}>
-            {loading ? 'Generando...' : 'Generar con automathon'}
-          </button>
-          {error && <div className="alert alert-error">{error}</div>}
-          <div className="visualization-area">
-            {automathonImg ? (
-              <img src={automathonImg} alt="Autómata automathon" />
-            ) : (
-              <p className="loading">Haz clic en "Generar con automathon" para visualizar el autómata</p>
             )}
           </div>
         </div>
