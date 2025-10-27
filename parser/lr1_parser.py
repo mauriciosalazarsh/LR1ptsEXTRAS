@@ -561,38 +561,38 @@ F -> ( E )
 F -> id
 """
     
-    print("🔍 Testeando Parser LR(1)")
+    print("Testeando Parser LR(1)")
     print("=" * 50)
-    
+
     try:
         parser.parse_grammar(grammar)
-        print("✅ Gramática procesada exitosamente")
-        
+        print("[OK] Gramática procesada exitosamente")
+
         # Mostrar conjuntos FIRST y FOLLOW
         ff = parser.get_first_follow_sets()
-        print("\n📋 Conjuntos FIRST:")
+        print("\nConjuntos FIRST:")
         for nt, first_set in ff['first'].items():
             print(f"  FIRST({nt}) = {{{', '.join(first_set)}}}")
-        
-        print("\n📋 Conjuntos FOLLOW:")
+
+        print("\nConjuntos FOLLOW:")
         for nt, follow_set in ff['follow'].items():
             print(f"  FOLLOW({nt}) = {{{', '.join(follow_set)}}}")
-        
-        print(f"\n🏗️  Estados del autómata: {len(parser.states)}")
-        
+
+        print(f"\nEstados del autómata: {len(parser.states)}")
+
         # Probar cadenas
         test_strings = ["id", "id + id", "id + id * id", "( id + id ) * id"]
-        print("\n🧪 Probando cadenas:")
-        
+        print("\nProbando cadenas:")
+
         for test_str in test_strings:
             result = parser.parse_string(test_str)
-            status = "✅ ACEPTADA" if result['success'] else "❌ RECHAZADA"
+            status = "[ACEPTADA]" if result['success'] else "[RECHAZADA]"
             print(f"  '{test_str}' -> {status}")
-        
-        print("\n🎉 ¡Todas las pruebas completadas!")
-        
+
+        print("\n[OK] Todas las pruebas completadas")
+
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[ERROR] {e}")
         import traceback
         traceback.print_exc()
 

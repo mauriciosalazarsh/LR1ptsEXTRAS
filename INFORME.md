@@ -654,18 +654,18 @@ D -> ε
 | 11 | 0 1 3 5 7 12 13 15 | $ | reduce 1 (S → q * A * B * C) |
 | 12 | 0 2 | $ | ACCEPT |
 
-**Resultado:** ✅ ACEPTADA
+**Resultado:** [OK] ACEPTADA
 
 ### 5.5 Cadenas de Prueba
 
 **Cadenas Aceptadas:**
-- `q * a * a * b` ✅
-- `q * b * b * b * a * b` ✅
+- `q * a * a * b` [OK]
+- `q * b * b * b * a * b` [OK]
 
 **Cadenas Rechazadas:**
-- `a * a * b` ❌ (No empieza con q)
-- `q * * a` ❌ (Doble asterisco)
-- `q a b` ❌ (Faltan asteriscos)
+- `a * a * b` [X] (No empieza con q)
+- `q * * a` [X] (Doble asterisco)
+- `q a b` [X] (Faltan asteriscos)
 
 ---
 
@@ -682,29 +682,29 @@ El proyecto implementa LR(1) canónico, que es **más potente** que LALR(1):
 
 ### 6.2 Funcionalidades Implementadas
 
-✅ **Parser LR(1) Completo**
+[OK] **Parser LR(1) Completo**
 - Cálculo de conjuntos FIRST y FOLLOW
 - Construcción del autómata canónico LR(1)
 - Generación de tablas ACTION y GOTO
 - Análisis de cadenas con trazabilidad
 
-✅ **Visualizaciones Múltiples**
+[OK] **Visualizaciones Múltiples**
 - Graphviz: Muestra items LR(1) completos con lookaheads
 - automathon: Visualización simplificada tipo DFA
 - Tabla ACTION/GOTO interactiva con colores
 
-✅ **Interfaz Web Moderna**
+[OK] **Interfaz Web Moderna**
 - React con componentes modulares
 - Responsive design
 - Feedback visual inmediato
 - Manejo de errores robusto
 
-✅ **Soporte de Producciones Epsilon**
+[OK] **Soporte de Producciones Epsilon**
 - Manejo correcto de producciones vacías
 - Cálculo preciso de FIRST y FOLLOW con ε
 - Análisis correcto de cadenas con derivaciones epsilon
 
-✅ **Docker**
+[OK] **Docker**
 - Containerización completa
 - Docker Compose para orquestación
 - Hot reload en desarrollo
@@ -742,22 +742,22 @@ El proyecto implementa LR(1) canónico, que es **más potente** que LALR(1):
 
 | Requisito | Estado | Detalles |
 |-----------|--------|----------|
-| Parser LALR(1) | ✅ SUPERADO | Se implementó LR(1), más potente |
-| Interfaz en app | ✅ CUMPLIDO | React moderna con múltiples vistas |
-| Reporte pequeño | ✅ CUMPLIDO | Este documento |
-| Solo Python | ✅ CUMPLIDO | Backend 100% en Python |
-| Presentación | ✅ LISTO | Proyecto funcional completo |
+| Parser LALR(1) | [OK] SUPERADO | Se implementó LR(1), más potente |
+| Interfaz en app | [OK] CUMPLIDO | React moderna con múltiples vistas |
+| Reporte pequeño | [OK] CUMPLIDO | Este documento |
+| Solo Python | [OK] CUMPLIDO | Backend 100% en Python |
+| Presentación | [OK] LISTO | Proyecto funcional completo |
 
 ### 7.2 Funcionalidades Adicionales (No Requeridas)
 
-- ✅ Visualización del autómata (2 métodos)
-- ✅ Análisis de cadenas con traza
-- ✅ Tabla ACTION/GOTO interactiva
-- ✅ Conjuntos FIRST/FOLLOW
-- ✅ Docker y Docker Compose
-- ✅ Frontend en React (no requerido)
-- ✅ API REST completa
-- ✅ Documentación extensa
+- [OK] Visualización del autómata (2 métodos)
+- [OK] Análisis de cadenas con traza
+- [OK] Tabla ACTION/GOTO interactiva
+- [OK] Conjuntos FIRST/FOLLOW
+- [OK] Docker y Docker Compose
+- [OK] Frontend en React (no requerido)
+- [OK] API REST completa
+- [OK] Documentación extensa
 
 ---
 
@@ -904,11 +904,11 @@ Este proyecto demuestra una implementación completa y funcional de un parser LR
 
 ### 10.2 Cumplimiento de Objetivos
 
-✅ **Parser LR(1):** Implementado y probado
-✅ **Interfaz Web:** React moderna y funcional
-✅ **Reporte:** Este documento completo
-✅ **Solo Python:** Backend 100% Python
-✅ **Supera LALR(1):** LR(1) es más potente
+[OK] **Parser LR(1):** Implementado y probado
+[OK] **Interfaz Web:** React moderna y funcional
+[OK] **Reporte:** Este documento completo
+[OK] **Solo Python:** Backend 100% Python
+[OK] **Supera LALR(1):** LR(1) es más potente
 
 ### 10.3 Aprendizajes
 

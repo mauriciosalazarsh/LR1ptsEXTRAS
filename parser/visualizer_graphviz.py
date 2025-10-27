@@ -166,7 +166,7 @@ class LR1GraphvizVisualizer:
         # Renderizar
         output_path = self.dot.render(filename, cleanup=True)
 
-        print(f"✅ Autómata LR(1) generado: {output_path}")
+        print(f"[OK] Autómata LR(1) generado: {output_path}")
 
         # Abrir archivo si se solicita
         if view_file and os.path.exists(output_path):
@@ -190,7 +190,7 @@ class LR1GraphvizVisualizer:
         with open(filename, 'w') as f:
             f.write(self.dot.source)
 
-        print(f"✅ Archivo DOT guardado: {filename}")
+        print(f"[OK] Archivo DOT guardado: {filename}")
         return filename
 
     def get_automaton_info(self) -> Dict:
@@ -208,13 +208,13 @@ class LR1GraphvizVisualizer:
         info = self.get_automaton_info()
 
         print("\n" + "="*70)
-        print("📊 RESUMEN DEL AUTÓMATA LR(1)")
+        print("RESUMEN DEL AUTOMATA LR(1)")
         print("="*70)
-        print(f"📍 Estados: {info['num_states']}")
-        print(f"🔀 Transiciones: {info['num_transitions']}")
-        print(f"🔤 Terminales: {{{', '.join(info['terminals'])}}}")
-        print(f"🔠 No terminales: {{{', '.join(info['non_terminals'])}}}")
-        print(f"📝 Producciones: {info['num_productions']}")
+        print(f"Estados: {info['num_states']}")
+        print(f"Transiciones: {info['num_transitions']}")
+        print(f"Terminales: {{{', '.join(info['terminals'])}}}")
+        print(f"No terminales: {{{', '.join(info['non_terminals'])}}}")
+        print(f"Producciones: {info['num_productions']}")
         print("="*70 + "\n")
 
 
@@ -235,23 +235,23 @@ D -> C
 D -> ε
 """
 
-    print("🔧 Construyendo parser LR(1)...")
+    print("[INFO] Construyendo parser LR(1)...")
     parser = LR1Parser()
     parser.parse_grammar(grammar)
 
-    print("🎨 Creando visualización mejorada con Graphviz...")
+    print("[INFO] Creando visualización mejorada con Graphviz...")
     visualizer = LR1GraphvizVisualizer(parser)
 
     # Mostrar resumen
     visualizer.print_automaton_summary()
 
     # Generar visualizaciones en múltiples formatos
-    print("📊 Generando visualizaciones...")
+    print("[INFO] Generando visualizaciones...")
     visualizer.visualize("AUTOMATA_LR1_FINAL", output_format='png')
     visualizer.visualize("AUTOMATA_LR1_FINAL_PDF", output_format='pdf', view_file=False)
     visualizer.save_dot_file("AUTOMATA_LR1_FINAL.dot")
 
-    print("\n✅ ¡Visualización completada exitosamente!")
+    print("\n[OK] Visualización completada exitosamente!")
     print("\nArchivos generados:")
     print("  • AUTOMATA_LR1_FINAL.png - Imagen del autómata")
     print("  • AUTOMATA_LR1_FINAL_PDF.pdf - Versión en PDF")
