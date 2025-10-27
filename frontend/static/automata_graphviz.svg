@@ -109,7 +109,7 @@
 <title>2&#45;&gt;accept</title>
 <path fill="none" stroke="red" stroke-width="2" d="M739.29,-867.43C785.93,-870.66 834.79,-874.04 874.02,-876.76"/>
 <polygon fill="red" stroke="red" stroke-width="2" points="872.11,-880.14 882.33,-877.34 872.59,-873.16 872.11,-880.14"/>
-<text xml:space="preserve" text-anchor="middle" x="765.59" y="-871.7" font-family="Arial Bold" font-size="14.00" fill="red"> $ </text>
+<text xml:space="preserve" text-anchor="middle" x="765.59" y="-872.8" font-family="Arial Bold" font-size="16.00" fill="red">$</text>
 </g>
 <!-- 3&#45;&gt;1 -->
 <g id="edge8" class="edge">
