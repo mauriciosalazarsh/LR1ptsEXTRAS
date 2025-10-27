@@ -139,10 +139,13 @@ class LR1GraphvizVisualizer:
             self.dot.edge(
                 str(accept_state),
                 'accept',
-                label=' $ ',
+                label='$',
                 fontcolor='red',
                 color='red',
-                style='bold'
+                style='bold',
+                fontsize='16',
+                labeldistance='2.5',
+                labelangle='0'
             )
 
         return self.dot
