@@ -40,7 +40,7 @@ function VisualizationTabs({ details }) {
   // Manejadores de zoom y pan
   const handleWheel = (e) => {
     e.preventDefault()
-    const delta = e.deltaY > 0 ? 0.9 : 1.1
+    const delta = e.deltaY > 0 ? 0.95 : 1.05
     setScale(prevScale => Math.min(Math.max(0.1, prevScale * delta), 5))
   }
 
@@ -231,11 +231,6 @@ function VisualizationTabs({ details }) {
               <p className="loading">Haz clic en "Generar con Graphviz" para visualizar el autómata</p>
             )}
           </div>
-          {graphvizSvg && (
-            <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-              <strong>Controles:</strong> Rueda del ratón para zoom | Arrastrar para mover | Zoom actual: {Math.round(scale * 100)}%
-            </div>
-          )}
         </div>
       )}
 
