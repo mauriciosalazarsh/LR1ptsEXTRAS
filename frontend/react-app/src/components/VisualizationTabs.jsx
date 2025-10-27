@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import axios from 'axios'
 
 const API_URL = 'http://localhost:5001/api'
@@ -40,11 +40,13 @@ function VisualizationTabs({ details }) {
   // Manejadores de zoom y pan
   const handleWheel = (e) => {
     e.preventDefault()
+    e.stopPropagation()
     const delta = e.deltaY > 0 ? 0.95 : 1.05
     setScale(prevScale => Math.min(Math.max(0.1, prevScale * delta), 5))
   }
 
   const handleMouseDown = (e) => {
+    e.preventDefault()
     setIsDragging(true)
     setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
   }
@@ -66,17 +68,6 @@ function VisualizationTabs({ details }) {
     setScale(1)
     setPosition({ x: 0, y: 0 })
   }
-
-  // Effect para agregar/remover event listeners
-  useEffect(() => {
-    const container = svgContainerRef.current
-    if (container && graphvizSvg) {
-      container.addEventListener('wheel', handleWheel, { passive: false })
-      return () => {
-        container.removeEventListener('wheel', handleWheel)
-      }
-    }
-  }, [graphvizSvg])
 
 
   const loadParsingTable = async () => {
@@ -212,6 +203,7 @@ function VisualizationTabs({ details }) {
               borderRadius: '8px',
               minHeight: '400px'
             }}
+            onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
