@@ -310,12 +310,12 @@ Se incluye a continuación un ejemplo de gramática y los conjuntos FIRST y FOLL
 S -> q * A * B * C
 A -> a
 A -> b * b * D
-B -> a | ε
-C -> b | ε
-D -> C | ε
+B -> a | epsilon
+C -> b | epsilon
+D -> C | epsilon
 \end{verbatim}
 
-Nótese el uso del operador ``|'' para especificar alternativas en las producciones de B, C y D.
+Nótese el uso del operador ``|'' para especificar alternativas en las producciones de B, C y D. El símbolo \texttt{epsilon} representa la producción vacía ($\varepsilon$).
 
 \subsection{Conjuntos FIRST}
 
