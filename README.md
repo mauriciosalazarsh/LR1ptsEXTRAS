@@ -247,4 +247,8 @@ La tabla ACTION/GOTO incluye:
 
 ## Autores
 
+- Salazar Hillenbrand, Mauricio
+- Alvarado Vargas, Martin Fabian
+- Najarro Mancco, Christopher Eloy
+
 Proyecto desarrollado para el curso de Compiladores - UTEC
