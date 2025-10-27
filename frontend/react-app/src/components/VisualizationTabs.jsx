@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 
 const API_URL = 'http://localhost:5001/api'
@@ -10,6 +10,13 @@ function VisualizationTabs({ details }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  // Estado para zoom y pan
+  const [scale, setScale] = useState(1)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const svgContainerRef = useRef(null)
+
   const generateGraphviz = async () => {
     setLoading(true)
     setError(null)
@@ -17,6 +24,9 @@ function VisualizationTabs({ details }) {
       const response = await axios.post(`${API_URL}/generate_graphviz`)
       if (response.data.success) {
         setGraphvizSvg(response.data.svg)
+        // Resetear zoom al generar nuevo gráfico
+        setScale(1)
+        setPosition({ x: 0, y: 0 })
       } else {
         setError(response.data.error)
       }
@@ -26,6 +36,47 @@ function VisualizationTabs({ details }) {
       setLoading(false)
     }
   }
+
+  // Manejadores de zoom y pan
+  const handleWheel = (e) => {
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? 0.9 : 1.1
+    setScale(prevScale => Math.min(Math.max(0.1, prevScale * delta), 5))
+  }
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true)
+    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
+  }
+
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      })
+    }
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const resetZoom = () => {
+    setScale(1)
+    setPosition({ x: 0, y: 0 })
+  }
+
+  // Effect para agregar/remover event listeners
+  useEffect(() => {
+    const container = svgContainerRef.current
+    if (container && graphvizSvg) {
+      container.addEventListener('wheel', handleWheel, { passive: false })
+      return () => {
+        container.removeEventListener('wheel', handleWheel)
+      }
+    }
+  }, [graphvizSvg])
 
 
   const loadParsingTable = async () => {
@@ -139,17 +190,52 @@ function VisualizationTabs({ details }) {
 
       {activeTab === 'graphviz' && (
         <div className="tab-content active">
-          <button className="btn btn-success" onClick={generateGraphviz} disabled={loading}>
-            {loading ? 'Generando...' : 'Generar con Graphviz'}
-          </button>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <button className="btn btn-success" onClick={generateGraphviz} disabled={loading}>
+              {loading ? 'Generando...' : 'Generar con Graphviz'}
+            </button>
+            {graphvizSvg && (
+              <button className="btn btn-secondary" onClick={resetZoom}>
+                Resetear Zoom
+              </button>
+            )}
+          </div>
           {error && <div className="alert alert-error">{error}</div>}
-          <div className="visualization-area">
+          <div
+            ref={svgContainerRef}
+            className="visualization-area"
+            style={{
+              overflow: 'hidden',
+              cursor: isDragging ? 'grabbing' : 'grab',
+              position: 'relative',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              minHeight: '400px'
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
             {graphvizSvg ? (
-              <div dangerouslySetInnerHTML={{ __html: graphvizSvg }} />
+              <div
+                style={{
+                  transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+                  transformOrigin: '0 0',
+                  transition: isDragging ? 'none' : 'transform 0.1s',
+                  display: 'inline-block'
+                }}
+                dangerouslySetInnerHTML={{ __html: graphvizSvg }}
+              />
             ) : (
               <p className="loading">Haz clic en "Generar con Graphviz" para visualizar el autómata</p>
             )}
           </div>
+          {graphvizSvg && (
+            <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+              <strong>Controles:</strong> Rueda del ratón para zoom | Arrastrar para mover | Zoom actual: {Math.round(scale * 100)}%
+            </div>
+          )}
         </div>
       )}
 
