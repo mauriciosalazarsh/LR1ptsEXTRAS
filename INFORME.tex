@@ -2,12 +2,22 @@
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage{url}
+\usepackage[breaklinks=true]{hyperref}
 \usepackage{listings}
 \usepackage{color}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{xspace}
+
+% Evitar problemas de overfull hbox
+\sloppy
+\setlength{\emergencystretch}{3em}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
 
 % Configuración para código fuente
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -63,7 +73,7 @@ Este documento describe de manera detallada la implementación de un \emph{anali
   \item Proporcionar una interfaz web intuitiva para interactuar con el parser y visualizar resultados.
   \item Permitir la visualización del autómata LR(1) y de la tabla de análisis de manera clara y profesional.
   \item Facilitar el análisis de cadenas con trazabilidad paso a paso.
-  \item Soportar sintaxis con el operador \verb{|} para especificar múltiples producciones en una sola línea.
+  \item Soportar sintaxis con el operador ``|'' para especificar múltiples producciones en una sola línea.
 \end{itemize}
 
 \section{Fundamentos teóricos}
@@ -122,16 +132,16 @@ El proyecto se divide en tres módulos principales: el backend en Python, el par
 
 El backend está construido con \textbf{Flask~3.0.0} y expone una API REST para construir el parser, generar visualizaciones y analizar cadenas.  El archivo \texttt{app.py} define los siguientes endpoints principales:
 \begin{itemize}
-  \item \verb|/api/build_parser| (POST): recibe una gramática, construye el parser e informa sobre el autómata (número de estados y transiciones, terminales, no terminales, producciones y conjuntos FIRST/FOLLOW).
-  \item \verb|/api/parse_string| (POST): recibe una cadena de entrada y devuelve si es aceptada junto con la traza de análisis.
-  \item \verb|/api/generate_graphviz| (POST): genera una representación visual del autómata en formato \texttt{SVG} y \texttt{PNG} mediante Graphviz.
-  \item \verb|/api/get_parsing_table| (GET): devuelve la tabla ACTION/GOTO completa para inspección o visualización.
+  \item \texttt{/api/build\_parser} (POST): recibe una gramática, construye el parser e informa sobre el autómata (número de estados y transiciones, terminales, no terminales, producciones y conjuntos FIRST/FOLLOW).
+  \item \texttt{/api/parse\_string} (POST): recibe una cadena de entrada y devuelve si es aceptada junto con la traza de análisis.
+  \item \texttt{/api/generate\_graphviz} (POST): genera una representación visual del autómata en formato \texttt{SVG} y \texttt{PNG} mediante Graphviz.
+  \item \texttt{/api/get\_parsing\_table} (GET): devuelve la tabla ACTION/GOTO completa para inspección o visualización.
 \end{itemize}
 El backend utiliza las clases implementadas en \texttt{parser/lr1\_parser.py} para procesar la gramática y analizar cadenas.  Para la visualización se hace uso de \texttt{graphviz} y \texttt{networkx}, y se soporta \texttt{CORS} para permitir el consumo desde el frontend.
 
 \subsection{Parser}
 
-El núcleo del proyecto se encuentra en el paquete \texttt{parser/}.  La clase central es \texttt{LR1Parser}, implementada en \verb|lr1_parser.py|, que encapsula toda la lógica de construcción del parser LR(1).  A continuación se muestran algunos de sus elementos más importantes (extracto):
+El núcleo del proyecto se encuentra en el paquete \texttt{parser/}.  La clase central es \texttt{LR1Parser}, implementada en \texttt{lr1\_parser.py}, que encapsula toda la lógica de construcción del parser LR(1).  A continuación se muestran algunos de sus elementos más importantes (extracto):
 
 \begin{lstlisting}[style=mypython, language=Python, caption={Definición de clases y atributos principales del parser.}]
 from dataclasses import dataclass, field
@@ -176,7 +186,7 @@ La interfaz de usuario está construida con \textbf{React~18} y utiliza \texttt{
   \item \texttt{VisualizationTabs.jsx}: organiza en pestañas la visualización Graphviz y la tabla ACTION/GOTO.  Al cambiar de pestaña se realizan peticiones a la API para obtener la última versión de la visualización.
   \item \texttt{StringParser.jsx}: permite ingresar una cadena de entrada y consultar si es aceptada, mostrando además la traza de análisis en una tabla.
 \end{itemize}
-A modo de ejemplo, el código de \verb|GrammarEditor.jsx| luce así:
+A modo de ejemplo, el código de \texttt{GrammarEditor.jsx} luce así:
 
 \begin{lstlisting}[style=myjavascript, language=JavaScript, caption={Componente para editar y construir la gramática.}]
 function GrammarEditor({ onBuild, loading, error }) {
@@ -276,7 +286,7 @@ El frontend estará disponible en \url{http://localhost:5173}
 \subsection{Funciones de la interfaz}
 
 \begin{itemize}
-  \item \textbf{Editor de gramáticas}.  Permite escribir gramáticas libres de contexto, separando símbolos con espacios y utilizando \verb|ε| o \verb|epsilon| para producciones vacías.  Además, soporta el uso del operador \verb{|} para especificar múltiples alternativas en una sola línea (por ejemplo, \verb{C -> a | b}).
+  \item \textbf{Editor de gramáticas}.  Permite escribir gramáticas libres de contexto, separando símbolos con espacios y utilizando $\varepsilon$ o \texttt{epsilon} para producciones vacías.  Además, soporta el uso del operador ``|'' para especificar múltiples alternativas en una sola línea (por ejemplo, \texttt{C -> a | b}).
   \item \textbf{Construcción del parser}.  Al pulsar «Construir Parser» se envía la gramática al backend; el sistema responde con el número de estados, transiciones y los conjuntos FIRST y FOLLOW.
   \item \textbf{Visualización del autómata}.  La pestaña «Graphviz» muestra los items LR(1) con sus lookaheads.  La visualización incluye una transición especial con el símbolo \$ hacia un estado final marcado como ACCEPT.
   \item \textbf{Tabla ACTION/GOTO}.  Permite inspeccionar la tabla de análisis completa; las acciones \texttt{shift}, \texttt{reduce} y \texttt{accept} se colorean para mayor claridad.
@@ -298,7 +308,7 @@ C -> b | ε
 D -> C | ε
 \end{verbatim}
 
-Nótese el uso del operador \verb{|} para especificar alternativas en las producciones de B, C y D.
+Nótese el uso del operador ``|'' para especificar alternativas en las producciones de B, C y D.
 
 \subsection{Conjuntos FIRST}
 
@@ -350,7 +360,7 @@ Para la gramática anterior se obtienen 19 estados y 18 transiciones.  El autóm
 
 \subsection{Traza de análisis de cadena}
 
-A continuación se muestra la traza generada al analizar la cadena \verb|q * a * a * b|, donde cada fila indica el contenido de la pila, la entrada restante y la acción tomada:
+A continuación se muestra la traza generada al analizar la cadena \texttt{q * a * a * b}, donde cada fila indica el contenido de la pila, la entrada restante y la acción tomada:
 
 \begin{longtable}{lll p{5cm}}
 \toprule
@@ -376,7 +386,7 @@ Paso & Pila & Entrada & Acción \\
 El proyecto presenta varias funcionalidades que exceden los requisitos del examen:
 \begin{itemize}
   \item \textbf{Parser LR(1) completo}.  Se implementa un algoritmo LR(1) canónico en lugar de LALR(1), con cálculo correcto de lookaheads, manejo de producciones \emph{epsilon} y construcción de tablas ACTION/GOTO.
-  \item \textbf{Soporte para sintaxis con alternativas}.  El parser reconoce el operador \verb{|} para especificar múltiples producciones en una sola línea, simplificando la escritura de gramáticas.
+  \item \textbf{Soporte para sintaxis con alternativas}.  El parser reconoce el operador ``|'' para especificar múltiples producciones en una sola línea, simplificando la escritura de gramáticas.
   \item \textbf{Visualización profesional con Graphviz}.  Se generan visualizaciones detalladas que muestran los items LR(1) completos con lookaheads, estados coloreados (verde para inicial, rojo para aceptación) y una transición explícita con \$ hacia el estado ACCEPT.
   \item \textbf{Interfaz web moderna}.  La aplicación utiliza React con arquitectura de componentes y proporciona una experiencia de usuario fluida; la tabla ACTION/GOTO se colorea según el tipo de acción.
   \item \textbf{Manejo de errores}.  El backend valida gramáticas y cadenas, devolviendo mensajes descriptivos; la traza de análisis se detiene en caso de error sintáctico.
@@ -422,7 +432,7 @@ En cuanto al trabajo futuro se proponen las siguientes mejoras:
 
 \section{Conclusiones}
 
-Se ha desarrollado un analizador sintáctico LR(1) completo y se ha integrado con una interfaz web moderna, superando ampliamente los requisitos iniciales del proyecto.  El parser maneja adecuadamente producciones vacías, soporta sintaxis con alternativas mediante el operador \verb{|}, y genera lookaheads precisos, produciendo tablas ACTION/GOTO correctas.  La arquitectura modular del código facilita la reutilización y el mantenimiento.  Este proyecto no sólo demuestra conocimientos teóricos de análisis sintáctico, sino que también integra conceptos de desarrollo full–stack, y puede servir como base para diseñar lenguajes de programación o validar gramáticas en contextos académicos y profesionales.
+Se ha desarrollado un analizador sintáctico LR(1) completo y se ha integrado con una interfaz web moderna, superando ampliamente los requisitos iniciales del proyecto.  El parser maneja adecuadamente producciones vacías, soporta sintaxis con alternativas mediante el operador ``|'', y genera lookaheads precisos, produciendo tablas ACTION/GOTO correctas.  La arquitectura modular del código facilita la reutilización y el mantenimiento.  Este proyecto no sólo demuestra conocimientos teóricos de análisis sintáctico, sino que también integra conceptos de desarrollo full-stack, y puede servir como base para diseñar lenguajes de programación o validar gramáticas en contextos académicos y profesionales.
 
 \section{Referencias}
 
