@@ -4,6 +4,7 @@ matplotlib==3.8.2
 networkx==3.2.1
 numpy==1.26.2
 Werkzeug==3.0.1
+gunicorn==21.2.0
 
 # Librerías de visualización de autómatas
 graphviz>=0.16

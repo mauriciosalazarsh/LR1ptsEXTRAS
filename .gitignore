@@ -36,3 +36,9 @@ Thumbs.db
 # Generated test files (temporary visualizations)
 TEST_*.svg
 DEMO_*.svg
+
+# Environment variables (local)
+.env
+.env.local
+frontend/react-app/.env
+frontend/react-app/.env.local

@@ -24,10 +24,11 @@ static_dir = os.path.join(os.path.dirname(__file__), '../frontend/static')
 app = Flask(__name__, static_folder=static_dir)
 app.config['SECRET_KEY'] = 'lr1-parser-utec-2024'
 
-# Configurar CORS para permitir peticiones desde React (Vite usa puerto 5173)
+# Configurar CORS para permitir peticiones desde React
+# En producción permite todos los orígenes, en desarrollo solo localhost
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "*"],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type"]
     }
