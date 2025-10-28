@@ -12,9 +12,10 @@ D -> ε`
 
 function GrammarEditor({ onBuild, loading, error }) {
   const [grammar, setGrammar] = useState(DEFAULT_GRAMMAR)
+  const [parserType, setParserType] = useState('LR1')
 
   const handleBuild = () => {
-    onBuild(grammar)
+    onBuild(grammar, parserType)
   }
 
   const handleLoadExample = () => {
@@ -31,13 +32,27 @@ function GrammarEditor({ onBuild, loading, error }) {
         placeholder="Ingrese la gramática..."
         rows={10}
       />
+
+      <div className="parser-type-selector">
+        <label htmlFor="parser-type">Tipo de Parser:</label>
+        <select
+          id="parser-type"
+          value={parserType}
+          onChange={(e) => setParserType(e.target.value)}
+          className="parser-select"
+        >
+          <option value="LR1">LR(1)</option>
+          <option value="LALR1">LALR(1)</option>
+        </select>
+      </div>
+
       <div className="button-group">
         <button
           className="btn btn-primary"
           onClick={handleBuild}
           disabled={loading}
         >
-          {loading ? 'Construyendo...' : 'Construir Parser'}
+          {loading ? 'Construyendo...' : `Construir Parser ${parserType === 'LR1' ? 'LR(1)' : 'LALR(1)'}`}
         </button>
         <button
           className="btn btn-info"

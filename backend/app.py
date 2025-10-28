@@ -13,6 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from parser.lr1_parser import LR1Parser
+from parser.lalr1_parser import LALR1Parser
 from parser.visualizer_graphviz import LR1GraphvizVisualizer
 import base64
 from io import BytesIO
@@ -48,11 +49,15 @@ D -> C
 D -> ε"""
 
 
-def init_parser(grammar_text):
+def init_parser(grammar_text, parser_type='LR1'):
     """Inicializa el parser con una gramática"""
     global parser, graphviz_viz
 
-    parser = LR1Parser()
+    if parser_type.upper() == 'LALR1' or parser_type.upper() == 'LALR(1)':
+        parser = LALR1Parser()
+    else:
+        parser = LR1Parser()
+
     parser.parse_grammar(grammar_text)
 
     graphviz_viz = LR1GraphvizVisualizer(parser)
@@ -78,13 +83,14 @@ def index():
 
 @app.route('/api/build_parser', methods=['POST'])
 def build_parser():
-    """Construye el parser LR(1) con la gramática dada"""
+    """Construye el parser LR(1) o LALR(1) con la gramática dada"""
     try:
         data = request.json
         grammar = data.get('grammar', DEFAULT_GRAMMAR)
+        parser_type = data.get('parser_type', 'LR1')
 
         # Construir parser
-        init_parser(grammar)
+        init_parser(grammar, parser_type)
 
         # Obtener información
         info = graphviz_viz.get_automaton_info()
@@ -105,8 +111,12 @@ def build_parser():
                 'text': str(prod)
             })
 
+        # Determinar tipo de parser usado
+        parser_type_str = 'LALR(1)' if isinstance(parser, LALR1Parser) else 'LR(1)'
+
         return jsonify({
             'success': True,
+            'parser_type': parser_type_str,
             'info': info,
             'first_sets': first_sets,
             'follow_sets': follow_sets,

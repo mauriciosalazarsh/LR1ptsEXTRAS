@@ -101,6 +101,41 @@ body {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.parser-type-selector {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.parser-type-selector label {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 16px;
+}
+
+.parser-select {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  color: #1e40af;
+}
+
+.parser-select:hover {
+  border-color: #3b82f6;
+}
+
+.parser-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .btn {
   padding: 14px 32px;
   font-size: 16px;

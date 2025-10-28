@@ -163,7 +163,7 @@ function VisualizationTabs({ details }) {
           className={`tab ${activeTab === 'graphviz' ? 'active' : ''}`}
           onClick={() => setActiveTab('graphviz')}
         >
-          Graphviz (Items LR(1))
+          Autómata (Graphviz)
         </button>
         <button
           className={`tab ${activeTab === 'table' ? 'active' : ''}`}
